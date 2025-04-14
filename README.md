@@ -71,7 +71,27 @@ Graph-Makeover-Health/
 
 ## 📌 Data Sources
 
-- Mortality data (2015–2020) by disease, gender, and state — simulated or sourced from public records (you can link source if needed).
+This project used three primary datasets (including raw and poorly visualized graphs) for redesign and improvement:
+
+### Mortality Data by Gender and Disease (2015)
+
+Manually structured within the RMarkdown for comparative analysis.
+
+Used for creating gender-based bar charts and total death comparisons by disease.
+
+### OECD Country Tax & Net Wages Dataset
+
+Contains data on net wages, income tax, and employee social security contributions across 30+ OECD countries.
+
+Visualized as stacked bar charts and choropleth maps after redesign.
+
+### Android Social Media Usage Data
+
+Embedded inline and later cleaned.
+
+Used to compare popular vs. actively used apps on Android (e.g., YouTube, Facebook, WhatsApp).
+
+
 
 ---
 
