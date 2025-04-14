@@ -44,7 +44,7 @@ The aim is to:
 |----------------|-------------|
 | Overloaded bar charts with hard-to-read labels | Rotated labels, simplified axis |
 | Confusing color palettes | Switched to meaningful and colorblind-friendly schemes |
-| Static charts lacking impact | Added animation and interactivity |
+| Static charts lacking impact | Added animation and interactive globe|
 | No geographic context | Added choropleth maps for disease spread |
 | Lack of story/narrative | Introduced titles, subtitles, tooltips, and annotations |
 
