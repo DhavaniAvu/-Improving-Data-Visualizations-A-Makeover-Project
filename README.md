@@ -61,11 +61,9 @@ The aim is to:
 
 ## 📁 Project Structure
 
-Graph-Makeover-Health/
 - Badgraph_goodgraph_combined.Rmd : Complete analysis and all redesigns
 - Badgraph_goodgraph_combined.pptx: Presentation slides with Before/after visualizations
 - README.md                       : Project documentation (this file)
-
 
 ---
 
