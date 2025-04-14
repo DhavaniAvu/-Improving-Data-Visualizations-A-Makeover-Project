@@ -38,7 +38,7 @@ The aim is to:
 
 ---
 
-## 📊 What We Fixed
+## 📊 What I Fixed
 
 | Original Issue | Fix Applied |
 |----------------|-------------|
