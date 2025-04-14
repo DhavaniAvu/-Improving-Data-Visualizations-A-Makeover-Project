@@ -1,0 +1,431 @@
+---
+title: "A Makeover Project"
+author: "Dhavani Avu"
+date: "2023-03-08"
+output: html_document
+---
+```{r echo=TRUE, warning=FALSE}
+# Load the required libraries
+library(plotly)
+library(dplyr)
+library(ggplot2)
+library(gganimate)
+library(dplyr)
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+
+# Create a data frame with the provided data
+df <- data.frame(disease = c("Other", "Ischaemic heart diseases", "Stroke", "Dementia", "Lung cancer", 
+                             "Chronic Obstructive Pulmonary Diseases", "Diabetes", "Breast cancer", "Accidents", 
+                             "Alzheimer's disease", "Colorectal cancer", "Intentional self-harm", "Parkinson's disease"), 
+                 women_count = c(2677781, 541231, 416490, 230695, 199848, 172535, 171241, 164680, 155805, 
+                                 151367, 129397, 38285, 36100), 
+                 women_percent = c(53, 11, 8.2, 4.5, 3.9, 3.4, 3.4, 3.2, 3.1, 3, 2.5, 0.8, 0.7), 
+                 men_count = c(2647346, 671088, 366322, 314423, 252561, 213546, 162506, 153247, 132270, 
+                               116256, 109760, 68550, 45944), 
+                 men_percent = c(50, 13, 7, 6, 4.8, 4.1, 3.1, 2.9, 2.5, 2.2, 2.1, 1.3, 0.9))
+
+
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Create the plot
+
+fig <- plot_ly(data = df, x = ~disease) %>%
+  add_trace(y = ~women_count, name = "Women", type = "bar", marker = list(color = "pink", 
+                                                                          line = list(color = "black", width = 1)),
+            text = paste0(df$women_percent, "%"), textposition = "inside") %>%
+  add_trace(y = ~men_count, name = "Men", type = "bar", marker = list(color = "blue", 
+                                                                      line = list(color = "black", width = 1)),
+            text = paste0(df$men_percent, "%"), textposition = "inside") %>%
+  layout(title = "2015 Main causes of Morality by gender ",
+         xaxis = list(title = "Cause for death"),
+         yaxis = list(title = "Deaths"),
+         plot_bgcolor = "white",
+         paper_bgcolor = "#f6f0ff"
+         )
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+
+# Display the plot
+fig
+```
+
+```{r echo=TRUE, warning=FALSE}
+
+df <- data.frame(Disease = c( "Ischaemic heart Diseases", "Stroke", "Dementia", "Lung cancer", 
+                              "Chronic Obstructive Pulmonary Diseases", "Diabetes", "Breast cancer", "Accidents", 
+                              "Alzheimer's Disease", "Colorectal cancer", "Intentional self-harm", "Parkinson's Disease"), 
+                 women_count = c( 541231, 416490, 230695, 199848, 172535, 171241, 164680, 155805, 
+                                  151367, 129397, 38285, 36100), 
+                 women_percent = c( 11, 8.2, 4.5, 3.9, 3.4, 3.4, 3.2, 3.1, 3, 2.5, 0.8, 0.7), 
+                 men_count = c( 671088, 366322, 314423, 252561, 213546, 162506, 153247, 132270, 
+                                116256, 109760, 68550, 45944), 
+                 men_percent = c( 13, 7, 6, 4.8, 4.1, 3.1, 2.9, 2.5, 2.2, 2.1, 1.3, 0.9))
+
+df$total_deaths <- df$women_count + df$men_count
+
+
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Create the initial plot
+p <- ggplot(df, aes(Disease, total_deaths, fill = total_deaths)) +
+  geom_col() +
+  scale_fill_distiller(palette = "Reds", direction = 1, breaks = seq(min(df$total_deaths), max(df$total_deaths), by = 150000)) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    panel.grid.major.y = element_line(color = "white"),
+    panel.ontop = TRUE,
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 14), # increase x-axis label size
+    axis.text.y = element_text(size = 14), # increase y-axis label size
+    plot.title = element_text(size = 20) # increase plot title size
+  ) +
+  xlab("Disease") +
+  ylab("Deaths") 
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Create the animation
+a <- p + transition_states(Disease, wrap = FALSE) +
+  shadow_mark() +
+  labs(title = "Disease: {closest_state}")
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Render the animation
+animate(a, nframes = 50, fps = 5, renderer = gifski_renderer(), width = 800, height = 600) 
+```
+
+```{r echo=TRUE}
+
+# Create a data frame with state codes, disease names, deaths, and the highest state for each disease
+data <- data.frame(
+  state = c("LA", "MS", "DE", "GA", "KY", "WV", "OK", "HI", "SC", "AL", "SD", "WY", "VT"),
+  disease = c("Other", "Ischaemic heart diseases", "Stroke", "Dementia", "Lung cancer",
+              "Chronic Obstructive Pulmonary Diseases", "Diabetes", "Breast cancer", "Accidents",
+              "Alzheimer's disease", "Colorectal cancer", "Intentional self-harm", "Parkinson's disease"),
+  deaths = c(5325127, 1212319, 782812, 545118, 452409, 386081, 333747, 317927,
+             288075, 267623, 239157, 106835, 82044),
+  highest_state = c("Louisiana", "Mississippi", "Delaware", "Georgia", "Kentucky",
+                    "West Virginia", "Oklahoma", "Hawaii", "South Carolina", "Alabama",
+                    "South Dakota", "Wyoming", "Vermont")
+)
+
+
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Create a choropleth map
+map <- plot_geo(data, locationmode = "USA-states", scope = "usa") %>%
+  add_trace(
+    z = ~deaths, text = ~paste(disease, "<br>", "Deaths:", deaths),
+    locations = ~state, color = ~deaths, colors ="Set1"
+  ) %>%
+  colorbar(title = "Deaths") %>%
+  layout(
+    title = "Highest Deaths by Diseases in US States",
+    geo = list(scope = "usa", projection = list(type = "albers usa")),
+    annotations = list(
+      x = 0.95, y = 0.05, showarrow = FALSE,
+      text = "2015 US Health data"
+    ),
+    margin = list(l=50, r=50, t=50, b=50), # set margin to create a grey border
+    paper_bgcolor = '#f1f0f2', # set background color to transparent
+    plot_bgcolor = 'rgba(0,0,0,0)', # set plot area color to transparent
+    shapes=list(
+      list(
+        type="rect", # create rectangle shape for the border
+        x0=0, y0=0, x1=1, y1=1,
+        line=list(color='black', width=3),
+        fillcolor='rgba(0,0,0,0)'
+      )
+    )
+  )
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Display the map
+map
+```
+
+```{r echo=TRUE}
+
+# Create a data frame with state codes, disease names, deaths, and the highest state for each disease
+data <- data.frame(
+  state = c("AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"),
+  deaths = c(12981, 846, 11458, 7938, 61289, 7009, 7205, 1940,
+             45441, 17769,2605, 2825, 25652, 13948, 6813, 5624, 10077, 10665,
+             3009, 11481,12130, 24794, 7844, 7969, 14808, 2104, 3591, 6114,
+            2571, 18647,3508, 44450, 18474, 1323, 28069, 10310, 6859, 32042,
+            2371, 10092,1711, 15730, 43298, 3598, 1311, 14077, 11025, 4727,
+            11473, 1030))
+
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Create a choropleth map
+my_colors <- c("#e0f3db","#f7fcb9","#addd8e","#a1d99b","#31a354")
+map <- plot_geo(data, locationmode = "USA-states", scope = "usa") %>%
+  add_trace(
+    z = ~deaths, text = ~paste(state, "<br>", "Deaths:", deaths),
+    locations = ~state, color = ~deaths, colors = my_colors
+  ) %>%
+  colorbar(title = "Deaths") %>%
+  layout(
+    title = "Deaths because of Heart Diseases in US States (2015)",
+    geo = list(scope = "usa", projection = list(type = "albers usa")),
+    annotations = list(
+      x = 0.95, y = 0.05, showarrow = FALSE,
+      text = "2015 US Health Disease Deaths"
+    )
+  )
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Display the map
+map
+```
+
+```{r echo=TRUE}
+# Create a data frame with the provided data
+year=c("2020","2019","2018","2017","2016","2015","2014")
+death_di=c(1450,1224,1176,1173,1183,1255,1281)
+death_st=c(3391,3141,3088,2931,2967,2937,2663)
+death_al=c(3093,2659,2616,2563,2507,2282,1885)
+data <- data.frame(year = as.numeric(year), death_di, death_st, death_al)
+```
+
+```{r echo=TRUE}
+# Create the plot with ggplot2
+p <- ggplot(data, aes(x = year)) +
+  geom_line(aes(y = death_di, color = "Diabetes", linetype = "dashed"), size = 1.2) +
+  geom_line(aes(y = death_al, color = "Alzheimer", linetype = "dotted"), size = 1.2) +
+  geom_line(aes(y = death_st, color = "Stroke", linetype = "solid"), size = 1.2) +
+  geom_point(aes(y = death_di, color = "Diabetes"), size = 3) +
+  geom_point(aes(y = death_al, color = "Alzheimer"), size = 3) +
+  geom_point(aes(y = death_st, color = "Stroke"), size = 3) +
+  scale_color_manual(values = c("#FF7F00", "#1F78B4", "#33A02C")) +
+  scale_linetype_manual(values = c("dashed", "dotted", "solid")) +
+  labs(title = "Diseases of Alabama : Deaths",
+       x = "Year", y = "Deaths", color = "Diseases") +
+  theme_minimal() +
+  guides(linetype = FALSE) # remove the "linetype" label
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Create an interactive version of the plot using plotly
+p <- ggplotly(p) %>%
+  layout(
+    # Set the background color
+    plot_bgcolor = "#F2F2F2",
+    # Set the font style and color for the title and axis labels
+    title = list(text = "<b>Diseases of Alabama : Deaths</b>", font = list(size = 20, color = "black")),
+    xaxis = list(title = list(text = "<b>Year</b>", font = list(size = 16, color = "black"))),
+    yaxis = list(title = list(text = "<b>Deaths</b>", font = list(size = 16, color = "black")))
+  ) %>%
+  # Customize the legend font style and color
+  style(legend = list(font = list(size = 14, color = "black")))
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Show the interactive plot
+p
+```
+
+
+```{r echo=TRUE, warning=FALSE}
+# Define the data
+country <- c("Chile","South Korea","Poland","Japan","Israel","Mexico","Greece","Slovak Republic","Switzerland","Slovenia","Turkey","Czech Republic","United Kingdom","Austria","Spain","France","Hungary","Canada","Ireland","Portugal","Luxembourg","Estonia","Netherlands","Sweden","New Zealand","United States","Latvia","Germany","Norway","Finland","Italy","Australia","Belgium","Iceland","Denmark")
+netwages <- c(11304,15359,17298,17965,20829,20834,20900,21033,21099,21866,22394,26022,29793,31639,31916,32274,32617,34211,34224,34834,35744,36087,36345,38194,38925,39211,40834,41139,41608,41655,43835,44892,45390,46593,58864)
+incometax <- c(9.8,18.9,15,10.1,11.6,7.2,13.1,0,12.9,16.8,16.5,10,21.7,15.4,14.7,9.7,18.1,20.9,14.8,26.5,18,36.1,15.4,19.1,14.4,18.4,19.4,7.9,14,24.4,17.3,6.1,28.3,16.7,10.7)
+essc <- c(1.4,10.5,18.5,13.4,22.1,17.8,11,7,15,1.6,11,16,9.5,7.4,6.4,8,0,9.3,14.4,14,7,0,4,20.8,18,7.7,8.2,14.4,9.4,0,13.1,8.4,0.3,12.3,6.2)
+netwages2 <- netwages/1000
+```
+
+```{r echo=TRUE, warning=FALSE}
+
+# Create a data frame
+df <- data.frame(country, netwages2, incometax, essc)
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+
+# Create a stacked bar chart
+p <- plot_ly(df, x = ~country, y = ~netwages2, type = 'bar', name = 'Net Wages in 1000s') %>%
+  add_trace(y = ~incometax, name = 'Income Tax') %>%
+  add_trace(y = ~essc, name = 'ESSC') %>%
+  layout(title = "Net Wages in 1000s, Income Tax, and ESSC by Country",
+         xaxis = list(title = 'Country'),
+         yaxis = list(title = 'Amount'),
+         barmode = 'stack')
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Display the chart
+p
+```
+
+```{r echo=TRUE, warning=FALSE}
+ # create data frame
+df<- read.csv("2nd_badgraphdata(2).csv")
+```
+
+```{r echo=TRUE, warning=FALSE}
+# read world map data
+world <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# merge data frames
+df_map <- merge(world, df, by.x = 'COUNTRY', by.y = 'Country', all.x = TRUE)
+```
+
+```{r echo=TRUE, warning=FALSE}
+fig <- plot_geo(df_map) %>%
+  add_trace(
+    z = ~Net_Wages, color = ~Net_Wages, colors = "Blues",
+    text = ~paste("<b>",COUNTRY,"</b><br>",
+                  "Net Wages: $", Net_Wages,"<br>",
+                  "Income Tax: ",Income_Tax,"%<br>",
+                  "Employee SS Contributions: ",Employee_Social_Security_Contriutions,"%<br>",
+                  "Tax Rate: ",Tax_Rate,"%"), 
+    locations = ~CODE, marker = list(line = list(color = 'grey', width = 0.5))
+  ) %>%
+  colorbar(title = 'Net Wages', tickprefix = '$') %>%
+  layout(
+    title = 'Net Wages after Tax deduction (OECD Countries)',
+    geo = list(
+      showframe = FALSE,
+      showcoastlines = TRUE,
+      projection = list(type = 'Mercator'),
+      bgcolor = '#F8F8F8' # Change the background color here,
+    )
+  )
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# show map
+fig
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# create data frame
+df <- read.csv("new_2nd_badgraphdata(2).csv")
+```
+
+```{r echo=TRUE, warning=FALSE}
+
+# read world map data
+world <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# merge data frames
+df_map <- merge(world, df, by.x = 'COUNTRY', by.y = 'Country', all.x = TRUE)
+```
+
+
+```{r echo=TRUE, warning=FALSE}
+# create map
+fig <- plot_geo(df_map) %>%
+  add_trace(
+    z = ~Net_Wages, color = ~Net_Wages, colors = 'Blues',
+    text = ~ifelse(is.na(Net_Wages), "", paste("<b>",COUNTRY,"</b><br>",
+                                               "Net Wages: $", Net_Wages,"<br>",
+                                               "Income Tax: ",Income_Tax,"%<br>",
+                                               "Employee SS Contributions: ",Employee_Social_Security_Contriutions,"%<br>",
+                                               "Tax Rate: ",Tax_Rate,"%")),
+    locations = ~CODE) %>%
+  colorbar(title = 'Net Wages', tickprefix = '$') %>%
+  layout(
+    title = 'Net Wages after Tax Deduction',
+    geo = list(
+      showframe = TRUE, # set to TRUE to show borders for all countries
+      showcoastlines = TRUE,
+      projection = list(type = 'orthographic'), # Change the background color here,
+      scope = "world" # set to "world" to show borders for all countries
+      
+    )
+  )
+```
+
+```{r echo=TRUE, warning=FALSE}
+# show map
+fig
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Create a data frame with the provided data
+df <- data.frame(Applications=c("Youtube","Facebook","Twitter","Pinterest","Linkedin","Instagram","Snapchat","Whatsapp","Other"),
+                 TotalUsers=c(99.48,70.93,24.1,17.64,5.95,60.56,39.45,60.67,52.8),
+                 ActualUsers=c(30.14,66.07,19.66,18.62,10.76,47.98,35.67,54.27,21.98))
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Create the plot
+fig <- plot_ly(data = df, x = ~Applications, y = ~TotalUsers, name = "Total Users",
+               type = "bar", marker = list(color = "indianred3")) %>%
+  add_trace(y = ~ActualUsers, name = "Actual Users", marker = list(color = "lightgoldenrod3")) %>%
+  layout(title = "Popular & Active Social Apps on Android",
+         xaxis = list(title = "Applications"),
+         yaxis = list(title = "Count"),
+         paper_bgcolor = '#ededed',
+         plot_bgcolor = '#fff')
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+fig
+```
+
+```{r echo=TRUE, warning=FALSE}
+
+# Create a data frame with the provided data
+Applications=c("Linkedin","Pinterest","Twitter","Snapchat","Instagram","Other","Whatsapp","Facebook","Youtube")
+TotalUsers=c(5.95,17.64,24.1,39.45,51.78,55.4,60.67,70.93,99.48)
+ActualUsers=c(10.76,18.62,19.66,35.67,47.98,43.8,54.27,66.07,30.14)
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+# Create the plot
+data <- data.frame(Applications,TotalUsers,ActualUsers)
+data$Applications <- factor(data$Applications, levels = data[["Applications"]])
+
+fig <- plot_ly(data, x = ~Applications, y = ~TotalUsers, name = 'Total Users', type = 'scatter', mode = 'lines+markers', line = list(color = 'red'))
+fig <- fig %>% add_trace(y = ~ActualUsers, name = 'Actual Users', mode = 'lines+markers', line = list(color = 'blue')) %>%
+layout(title = "Popular & Actual Social Apps on Android",
+      xaxis = list(title = "Applications"),
+      yaxis = list(title = "Count"),
+      plot_bgcolor = '#f0f0f0')
+
+```
+
+```{r echo=TRUE, warning=FALSE}
+fig
+
+```
+
