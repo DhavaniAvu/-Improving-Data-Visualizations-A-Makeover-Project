@@ -1,4 +1,4 @@
-# 📉 to 📈 Improving Data Visualizations: A Makeover Project
+# Bad Graph 📉 to Good Graph 📈 - Improving Data Visualizations: A Makeover Project
 
 This project focuses on identifying poor visualizations from public and redesigning them using principles of data storytelling, clarity, and accessibility. I worked with mortality data from 2015–2020, showcasing how better chart design can uncover meaningful patterns hidden in cluttered or misleading plots.
 
